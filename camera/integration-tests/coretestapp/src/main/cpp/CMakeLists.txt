@@ -18,7 +18,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project(camera_test_app_jni)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -DEGL_EGLEXT_PROTOTYPES")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror -DEGL_EGLEXT_PROTOTYPES")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DEGL_EGLEXT_PROTOTYPES")
 
 add_library(
   opengl_renderer_jni SHARED
