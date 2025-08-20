@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.runtime.ComposeTabService
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.getValue
@@ -332,23 +333,29 @@ internal class RootNodeOwner(
         }
 
         override fun measureAndLayout(sendPointerUpdate: Boolean) {
-            measureAndLayoutDelegate
-                .updateRootConstraintsWithInfinityCheck(bounds?.toConstraints() ?: Constraints())
-            val rootNodeResized = measureAndLayoutDelegate.measureAndLayout {
-                if (sendPointerUpdate) {
-                    inputHandler.onPointerUpdate()
+            OhosTrace.traceSync("===RootNodeOwner.skiko measureAndLayout1") {
+                measureAndLayoutDelegate
+                    .updateRootConstraintsWithInfinityCheck(bounds?.toConstraints() ?: Constraints())
+                val rootNodeResized = measureAndLayoutDelegate.measureAndLayout {
+                    if (sendPointerUpdate) {
+                        inputHandler.onPointerUpdate()
+                    }
                 }
+                if (rootNodeResized) {
+                    snapshotInvalidationTracker.requestDraw()
+                }
+                measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
             }
-            if (rootNodeResized) {
-                snapshotInvalidationTracker.requestDraw()
-            }
-            measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+
         }
 
         override fun measureAndLayout(layoutNode: LayoutNode, constraints: Constraints) {
-            measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
-            inputHandler.onPointerUpdate()
-            measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+            OhosTrace.traceSync("===RootNodeOwner.skiko measureAndLayout2") {
+                measureAndLayoutDelegate.measureAndLayout(layoutNode, constraints)
+                inputHandler.onPointerUpdate()
+                measureAndLayoutDelegate.dispatchOnPositionedCallbacks()
+            }
+
         }
 
         override fun forceMeasureTheSubtree(layoutNode: LayoutNode, affectsLookahead: Boolean) {

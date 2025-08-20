@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.layout.AlignmentLine
@@ -1618,24 +1619,27 @@ internal class LayoutNodeLayoutDelegate(
      * and after the measurement.
      */
     private fun performMeasure(constraints: Constraints) {
-        check(layoutState == LayoutState.Idle) {
-            "layout state is not idle before measure starts"
+        OhosTrace.traceSync("===LayoutNodeLayoutDelegate performMeasure") {
+            check(layoutState == LayoutState.Idle) {
+                "layout state is not idle before measure starts"
+            }
+            layoutState = LayoutState.Measuring
+            measurePending = false
+            performMeasureConstraints = constraints
+            layoutNode.requireOwner().snapshotObserver.observeMeasureSnapshotReads(
+                layoutNode,
+                affectsLookahead = false,
+                performMeasureBlock
+            )
+            // The resulting layout state might be Ready. This can happen when the layout node's
+            // own modifier is querying an alignment line during measurement, therefore we
+            // need to also layout the layout node.
+            if (layoutState == LayoutState.Measuring) {
+                markLayoutPending()
+                layoutState = LayoutState.Idle
+            }
         }
-        layoutState = LayoutState.Measuring
-        measurePending = false
-        performMeasureConstraints = constraints
-        layoutNode.requireOwner().snapshotObserver.observeMeasureSnapshotReads(
-            layoutNode,
-            affectsLookahead = false,
-            performMeasureBlock
-        )
-        // The resulting layout state might be Ready. This can happen when the layout node's
-        // own modifier is querying an alignment line during measurement, therefore we
-        // need to also layout the layout node.
-        if (layoutState == LayoutState.Measuring) {
-            markLayoutPending()
-            layoutState = LayoutState.Idle
-        }
+
     }
 
     private fun performLookaheadMeasure(
