@@ -108,6 +108,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api(project(':compose:animation:animation'))
                 api(project(':compose:runtime:runtime'))
                 api(project(':compose:ui:ui'))
+                api(project(":compose:common"))
                 implementation(project(":compose:ui:ui-text"))
                 implementation(project(":compose:ui:ui-util"))
                 implementation(project(':compose:foundation:foundation-layout'))

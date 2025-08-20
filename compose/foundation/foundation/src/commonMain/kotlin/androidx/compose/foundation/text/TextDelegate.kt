@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.foundation.text.TextDelegate.Companion.paint
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Canvas
@@ -214,69 +215,72 @@ class TextDelegate(
         layoutDirection: LayoutDirection,
         prevResult: TextLayoutResult? = null
     ): TextLayoutResult {
-        if (prevResult != null && prevResult.canReuse(
-                text, style, placeholders, maxLines, softWrap, overflow, density, layoutDirection,
-                fontFamilyResolver, constraints
-            )
-        ) {
-            // NOTE(text-perf-review): seems like there's a nontrivial chance for us to be able
-            // to just return prevResult here directly?
-            return with(prevResult) {
-                copy(
-                    layoutInput = TextLayoutInput(
-                        layoutInput.text,
-                        style,
-                        layoutInput.placeholders,
-                        layoutInput.maxLines,
-                        layoutInput.softWrap,
-                        layoutInput.overflow,
-                        layoutInput.density,
-                        layoutInput.layoutDirection,
-                        layoutInput.fontFamilyResolver,
-                        constraints
-                    ),
-                    size = constraints.constrain(
-                        IntSize(
-                            multiParagraph.width.ceilToIntPx(),
-                            multiParagraph.height.ceilToIntPx()
+        OhosTrace.traceSync("===TextDelegate layout") {
+            if (prevResult != null && prevResult.canReuse(
+                    text, style, placeholders, maxLines, softWrap, overflow, density, layoutDirection,
+                    fontFamilyResolver, constraints
+                )
+            ) {
+                // NOTE(text-perf-review): seems like there's a nontrivial chance for us to be able
+                // to just return prevResult here directly?
+                return with(prevResult) {
+                    copy(
+                        layoutInput = TextLayoutInput(
+                            layoutInput.text,
+                            style,
+                            layoutInput.placeholders,
+                            layoutInput.maxLines,
+                            layoutInput.softWrap,
+                            layoutInput.overflow,
+                            layoutInput.density,
+                            layoutInput.layoutDirection,
+                            layoutInput.fontFamilyResolver,
+                            constraints
+                        ),
+                        size = constraints.constrain(
+                            IntSize(
+                                multiParagraph.width.ceilToIntPx(),
+                                multiParagraph.height.ceilToIntPx()
+                            )
                         )
                     )
-                )
+                }
             }
+
+            val multiParagraph = layoutText(
+                constraints,
+                layoutDirection
+            )
+
+            val size = constraints.constrain(
+                IntSize(
+                    multiParagraph.width.ceilToIntPx(),
+                    multiParagraph.height.ceilToIntPx()
+                )
+            )
+
+            // NOTE(text-perf-review): it feels odd to create the input + result at the same time. if
+            // the allocation of these objects is 1:1 then it might make sense to just merge them?
+            // Alternatively, we might be able to save some effort here by having a common object for
+            // the types that go into the result here that are less likely to change
+            return TextLayoutResult(
+                TextLayoutInput(
+                    text,
+                    style,
+                    placeholders,
+                    maxLines,
+                    softWrap,
+                    overflow,
+                    density,
+                    layoutDirection,
+                    fontFamilyResolver,
+                    constraints
+                ),
+                multiParagraph,
+                size
+            )
         }
 
-        val multiParagraph = layoutText(
-            constraints,
-            layoutDirection
-        )
-
-        val size = constraints.constrain(
-            IntSize(
-                multiParagraph.width.ceilToIntPx(),
-                multiParagraph.height.ceilToIntPx()
-            )
-        )
-
-        // NOTE(text-perf-review): it feels odd to create the input + result at the same time. if
-        // the allocation of these objects is 1:1 then it might make sense to just merge them?
-        // Alternatively, we might be able to save some effort here by having a common object for
-        // the types that go into the result here that are less likely to change
-        return TextLayoutResult(
-            TextLayoutInput(
-                text,
-                style,
-                placeholders,
-                maxLines,
-                softWrap,
-                overflow,
-                density,
-                layoutDirection,
-                fontFamilyResolver,
-                constraints
-            ),
-            multiParagraph,
-            size
-        )
     }
 
     companion object {
