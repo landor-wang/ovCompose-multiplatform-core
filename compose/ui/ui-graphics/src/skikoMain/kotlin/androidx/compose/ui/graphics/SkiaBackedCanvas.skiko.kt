@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.runtime.EnableSkiaBackedCanvasLog
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -67,55 +68,76 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] save")
         }
-        skia.save()
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko save") {
+            skia.save()
+        }
+
     }
 
     override fun restore() {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] restore")
         }
-        skia.restore()
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko restore") {
+            skia.restore()
+        }
+
     }
 
     override fun saveLayer(bounds: Rect, paint: Paint) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] saveLayer $bounds")
         }
-        skia.saveLayer(
-            bounds.left,
-            bounds.top,
-            bounds.right,
-            bounds.bottom,
-            paint.skia
-        )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko saveLayer") {
+            skia.saveLayer(
+                bounds.left,
+                bounds.top,
+                bounds.right,
+                bounds.bottom,
+                paint.skia
+            )
+        }
+
     }
 
     override fun translate(dx: Float, dy: Float) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] translate dx:${dx} dy:${dy}")
         }
-        skia.translate(dx, dy)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko translate") {
+            skia.translate(dx, dy)
+        }
+
     }
 
     override fun scale(sx: Float, sy: Float) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] scale dx dy = ${sx} ${sy}")
         }
-        skia.scale(sx, sy)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko scale") {
+            skia.scale(sx, sy)
+        }
+
     }
 
     override fun rotate(degrees: Float) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] rotate degrees = ${degrees}")
         }
-        skia.rotate(degrees)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko rotate") {
+            skia.rotate(degrees)
+        }
+
     }
 
     override fun skew(sx: Float, sy: Float) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] skew sx = ${sx} sy:${Float}")
         }
-        skia.skew(sx, sy)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko skew") {
+            skia.skew(sx, sy)
+        }
+
     }
 
     override fun concat(matrix: Matrix) {
@@ -123,7 +145,10 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
             kLog("[SkiaBackedCanvas] concat matrix = ${matrix}")
         }
         if (!matrix.isIdentity()) {
-            skia.concat(matrix.toSkia())
+            OhosTrace.traceSync("===SkiaBackedCanvas.skiko concat") {
+                skia.concat(matrix.toSkia())
+            }
+
         }
     }
 
@@ -132,7 +157,10 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
             kLog("[SkiaBackedCanvas] clipRect left:${left}  top:${top} right:${right} bottom:${bottom} clipOp:${clipOp}")
         }
         val antiAlias = true
-        skia.clipRect(SkRect.makeLTRB(left, top, right, bottom), clipOp.toSkia(), antiAlias)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko clipRect") {
+            skia.clipRect(SkRect.makeLTRB(left, top, right, bottom), clipOp.toSkia(), antiAlias)
+        }
+
     }
 
     override fun clipPath(path: Path, clipOp: ClipOp) {
@@ -140,21 +168,29 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
             kLog("[SkiaBackedCanvas] clipPath path:${path} clipOp:${clipOp}")
         }
         val antiAlias = true
-        skia.clipPath(path.asSkiaPath(), clipOp.toSkia(), antiAlias)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko clipPath") {
+            skia.clipPath(path.asSkiaPath(), clipOp.toSkia(), antiAlias)
+        }
     }
 
     override fun drawLine(p1: Offset, p2: Offset, paint: Paint) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] drawLine p1:${p1} p2:${p2} paint:${paint}")
         }
-        skia.drawLine(p1.x, p1.y, p2.x, p2.y, paint.skia)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawLine") {
+            skia.drawLine(p1.x, p1.y, p2.x, p2.y, paint.skia)
+        }
+
+
     }
 
     override fun drawRect(left: Float, top: Float, right: Float, bottom: Float, paint: Paint) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[SkiaBackedCanvas] drawRect left:${left} top:${top} right:${right} bottom:${bottom} paint:${paint}")
         }
-        skia.drawRect(SkRect.makeLTRB(left, top, right, bottom), paint.skia)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawRect") {
+            skia.drawRect(SkRect.makeLTRB(left, top, right, bottom), paint.skia)
+        }
     }
 
     override fun drawRoundRect(
@@ -169,25 +205,34 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[drawRoundRect] drawRoundRect left:${left} top:${top} right:${paint} bottom:${bottom} radiusX:${radiusX} radiusY:${radiusY} paint:${paint}")
         }
-        skia.drawRRect(
-            SkRRect.makeLTRB(
-                left,
-                top,
-                right,
-                bottom,
-                radiusX,
-                radiusY
-            ),
-            paint.skia
-        )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawRoundRect") {
+            skia.drawRRect(
+                SkRRect.makeLTRB(
+                    left,
+                    top,
+                    right,
+                    bottom,
+                    radiusX,
+                    radiusY
+                ),
+                paint.skia
+            )
+        }
+
     }
 
     override fun drawOval(left: Float, top: Float, right: Float, bottom: Float, paint: Paint) {
-        skia.drawOval(SkRect.makeLTRB(left, top, right, bottom), paint.skia)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawOval") {
+            skia.drawOval(SkRect.makeLTRB(left, top, right, bottom), paint.skia)
+        }
+
     }
 
     override fun drawCircle(center: Offset, radius: Float, paint: Paint) {
-        skia.drawCircle(center.x, center.y, radius, paint.skia)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawCircle") {
+            skia.drawCircle(center.x, center.y, radius, paint.skia)
+        }
+
     }
 
     override fun drawArc(
@@ -200,28 +245,38 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         useCenter: Boolean,
         paint: Paint
     ) {
-        skia.drawArc(
-            left,
-            top,
-            right,
-            bottom,
-            startAngle,
-            sweepAngle,
-            useCenter,
-            paint.skia
-        )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawArc") {
+            skia.drawArc(
+                left,
+                top,
+                right,
+                bottom,
+                startAngle,
+                sweepAngle,
+                useCenter,
+                paint.skia
+            )
+        }
+
     }
 
     override fun drawPath(path: Path, paint: Paint) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[drawRoundRect] drawPath path:${path}  paint:${paint}")
         }
-        skia.drawPath(path.asSkiaPath(), paint.skia)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawPath") {
+            skia.drawPath(path.asSkiaPath(), paint.skia)
+        }
+
     }
 
     override fun drawImage(image: ImageBitmap, topLeftOffset: Offset, paint: Paint) {
         val size = Size(image.width.toFloat(), image.height.toFloat())
-        drawImageRect(image, Offset.Zero, size, topLeftOffset, size, paint)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawImage") {
+            drawImageRect(image, Offset.Zero, size, topLeftOffset, size, paint)
+        }
+
+
     }
 
     override fun drawImageRect(
@@ -232,14 +287,17 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         dstSize: IntSize,
         paint: Paint
     ) {
-        drawImageRect(
-            image,
-            Offset(srcOffset.x.toFloat(), srcOffset.y.toFloat()),
-            Size(srcSize.width.toFloat(), srcSize.height.toFloat()),
-            Offset(dstOffset.x.toFloat(), dstOffset.y.toFloat()),
-            Size(dstSize.width.toFloat(), dstSize.height.toFloat()),
-            paint
-        )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawImageRect1") {
+            drawImageRect(
+                image,
+                Offset(srcOffset.x.toFloat(), srcOffset.y.toFloat()),
+                Size(srcSize.width.toFloat(), srcSize.height.toFloat()),
+                Offset(dstOffset.x.toFloat(), dstOffset.y.toFloat()),
+                Size(dstSize.width.toFloat(), dstSize.height.toFloat()),
+                paint
+            )
+        }
+
     }
 
     // TODO(demin): probably this method should be in the common Canvas
@@ -260,43 +318,49 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         // into jvmTarget=8 compose.
         // After this issue is resolved use:
         //     import org.jetbrains.skia.impl.use
-        Image.makeFromBitmap(bitmap).use { skiaImage ->
-            skia.drawImageRect(
-                skiaImage,
-                SkRect.makeXYWH(
-                    srcOffset.x,
-                    srcOffset.y,
-                    srcSize.width,
-                    srcSize.height
-                ),
-                SkRect.makeXYWH(
-                    dstOffset.x,
-                    dstOffset.y,
-                    dstSize.width,
-                    dstSize.height
-                ),
-                paint.filterQuality.toSkia(),
-                paint.skia,
-                true
-            )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawImageRect2") {
+            Image.makeFromBitmap(bitmap).use { skiaImage ->
+                skia.drawImageRect(
+                    skiaImage,
+                    SkRect.makeXYWH(
+                        srcOffset.x,
+                        srcOffset.y,
+                        srcSize.width,
+                        srcSize.height
+                    ),
+                    SkRect.makeXYWH(
+                        dstOffset.x,
+                        dstOffset.y,
+                        dstSize.width,
+                        dstSize.height
+                    ),
+                    paint.filterQuality.toSkia(),
+                    paint.skia,
+                    true
+                )
+            }
         }
+
     }
 
     override fun drawPoints(pointMode: PointMode, points: List<Offset>, paint: Paint) {
         if (EnableSkiaBackedCanvasLog) {
             kLog("[drawRoundRect] drawPoints pointMode:${pointMode}  points:${points} paint:${paint}")
         }
-        when (pointMode) {
-            // Draw a line between each pair of points, each point has at most one line
-            // If the number of points is odd, then the last point is ignored.
-            PointMode.Lines -> drawLines(points, paint, 2)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawPoints1") {
+            when (pointMode) {
+                // Draw a line between each pair of points, each point has at most one line
+                // If the number of points is odd, then the last point is ignored.
+                PointMode.Lines -> drawLines(points, paint, 2)
 
-            // Connect each adjacent point with a line
-            PointMode.Polygon -> drawLines(points, paint, 1)
+                // Connect each adjacent point with a line
+                PointMode.Polygon -> drawLines(points, paint, 1)
 
-            // Draw a point at each provided coordinate
-            PointMode.Points -> drawPoints(points, paint)
+                // Draw a point at each provided coordinate
+                PointMode.Points -> drawPoints(points, paint)
+            }
         }
+
     }
 
     override fun enableZ() = Unit
@@ -304,13 +368,16 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     override fun disableZ() = Unit
 
     private fun drawPoints(points: List<Offset>, paint: Paint) {
-        points.fastForEach { point ->
-            skia.drawPoint(
-                point.x,
-                point.y,
-                paint.skia
-            )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawPoints2") {
+            points.fastForEach { point ->
+                skia.drawPoint(
+                    point.x,
+                    point.y,
+                    paint.skia
+                )
+            }
         }
+
     }
 
     /**
@@ -326,19 +393,22 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
      * @see drawRawLines
      */
     private fun drawLines(points: List<Offset>, paint: Paint, stepBy: Int) {
-        if (points.size >= 2) {
-            for (i in 0 until points.size - 1 step stepBy) {
-                val p1 = points[i]
-                val p2 = points[i + 1]
-                skia.drawLine(
-                    p1.x,
-                    p1.y,
-                    p2.x,
-                    p2.y,
-                    paint.skia
-                )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawLines") {
+            if (points.size >= 2) {
+                for (i in 0 until points.size - 1 step stepBy) {
+                    val p1 = points[i]
+                    val p2 = points[i + 1]
+                    skia.drawLine(
+                        p1.x,
+                        p1.y,
+                        p2.x,
+                        p2.y,
+                        paint.skia
+                    )
+                }
             }
         }
+
     }
 
     /**
@@ -348,21 +418,27 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
         if (points.size % 2 != 0) {
             throw IllegalArgumentException("points must have an even number of values")
         }
-        when (pointMode) {
-            PointMode.Lines -> drawRawLines(points, paint, 2)
-            PointMode.Polygon -> drawRawLines(points, paint, 1)
-            PointMode.Points -> drawRawPoints(points, paint, 2)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawRawPoints1") {
+            when (pointMode) {
+                PointMode.Lines -> drawRawLines(points, paint, 2)
+                PointMode.Polygon -> drawRawLines(points, paint, 1)
+                PointMode.Points -> drawRawPoints(points, paint, 2)
+            }
         }
+
     }
 
     private fun drawRawPoints(points: FloatArray, paint: Paint, stepBy: Int) {
-        if (points.size % 2 == 0) {
-            for (i in 0 until points.size - 1 step stepBy) {
-                val x = points[i]
-                val y = points[i + 1]
-                skia.drawPoint(x, y, paint.skia)
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawRawPoints2") {
+            if (points.size % 2 == 0) {
+                for (i in 0 until points.size - 1 step stepBy) {
+                    val x = points[i]
+                    val y = points[i + 1]
+                    skia.drawPoint(x, y, paint.skia)
+                }
             }
         }
+
     }
 
     /**
@@ -381,33 +457,39 @@ internal class SkiaBackedCanvas(val skia: org.jetbrains.skia.Canvas) : Canvas {
     private fun drawRawLines(points: FloatArray, paint: Paint, stepBy: Int) {
         // Float array is treated as alternative set of x and y coordinates
         // x1, y1, x2, y2, x3, y3, ... etc.
-        if (points.size >= 4 && points.size % 2 == 0) {
-            for (i in 0 until points.size - 3 step stepBy * 2) {
-                val x1 = points[i]
-                val y1 = points[i + 1]
-                val x2 = points[i + 2]
-                val y2 = points[i + 3]
-                skia.drawLine(
-                    x1,
-                    y1,
-                    x2,
-                    y2,
-                    paint.skia
-                )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawRawLines") {
+            if (points.size >= 4 && points.size % 2 == 0) {
+                for (i in 0 until points.size - 3 step stepBy * 2) {
+                    val x1 = points[i]
+                    val y1 = points[i + 1]
+                    val x2 = points[i + 2]
+                    val y2 = points[i + 3]
+                    skia.drawLine(
+                        x1,
+                        y1,
+                        x2,
+                        y2,
+                        paint.skia
+                    )
+                }
             }
         }
+
     }
 
     override fun drawVertices(vertices: Vertices, blendMode: BlendMode, paint: Paint) {
-        skia.drawVertices(
-            vertices.vertexMode.toSkiaVertexMode(),
-            vertices.positions,
-            vertices.colors,
-            vertices.textureCoordinates,
-            vertices.indices,
-            blendMode.toSkia(),
-            paint.asFrameworkPaint()
-        )
+        OhosTrace.traceSync("===SkiaBackedCanvas.skiko drawVertices") {
+            skia.drawVertices(
+                vertices.vertexMode.toSkiaVertexMode(),
+                vertices.positions,
+                vertices.colors,
+                vertices.textureCoordinates,
+                vertices.indices,
+                blendMode.toSkia(),
+                paint.asFrameworkPaint()
+            )
+        }
+
     }
 
     private fun ClipOp.toSkia() = when (this) {

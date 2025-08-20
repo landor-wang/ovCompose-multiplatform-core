@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics.drawscope
 
 import androidx.annotation.FloatRange
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -543,21 +544,23 @@ class CanvasDrawScope : DrawScope {
         // drawing to a separate Layer/RenderNode only to draw that content back into the original
         // Canvas. If there is no previous canvas that was being drawing into, this ends up
         // resetting these parameters back to defaults defensively
-        val (prevDensity, prevLayoutDirection, prevCanvas, prevSize) = drawParams
-        drawParams.apply {
-            this.density = density
-            this.layoutDirection = layoutDirection
-            this.canvas = canvas
-            this.size = size
-        }
-        canvas.save()
-        this.block()
-        canvas.restore()
-        drawParams.apply {
-            this.density = prevDensity
-            this.layoutDirection = prevLayoutDirection
-            this.canvas = prevCanvas
-            this.size = prevSize
+        OhosTrace.traceSync("===CanvasDrawScope draw") {
+            val (prevDensity, prevLayoutDirection, prevCanvas, prevSize) = drawParams
+            drawParams.apply {
+                this.density = density
+                this.layoutDirection = layoutDirection
+                this.canvas = canvas
+                this.size = size
+            }
+            canvas.save()
+            this.block()
+            canvas.restore()
+            drawParams.apply {
+                this.density = prevDensity
+                this.layoutDirection = prevLayoutDirection
+                this.canvas = prevCanvas
+                this.size = prevSize
+            }
         }
     }
 
