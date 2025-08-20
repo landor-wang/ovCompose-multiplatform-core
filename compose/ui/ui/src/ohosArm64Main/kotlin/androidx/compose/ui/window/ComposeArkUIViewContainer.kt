@@ -100,7 +100,7 @@ internal class ComposeArkUIViewContainer(
 
     override fun onSurfaceChanged(width: Int, height: Int) {
         androidx.compose.ui.graphics.kLog("onSurfaceChanged width:$width height:$height")
-        OhosTrace.traceSync("KmmOnSurfaceChanged $width*$height") {
+        OhosTrace.traceSync("===ComposeArkUIViewContainer onSurfaceChanged $width*$height") {
             if (!nativeSurfaceHasBeenDestroyed) {
                 mediator?.setSize(width, height)
                 windowContext.setContainerSize(IntSize(width, height))

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 
@@ -38,6 +39,9 @@ interface DrawModifierNode : DelegatableNode {
  */
 fun DrawModifierNode.invalidateDraw() {
     if (node.isAttached) {
-        requireCoordinator(Nodes.Any).invalidateLayer()
+        OhosTrace.traceSync("===DrawModifierNode invalidateDraw" ) {
+            requireCoordinator(Nodes.Any).invalidateLayer()
+        }
+
     }
 }

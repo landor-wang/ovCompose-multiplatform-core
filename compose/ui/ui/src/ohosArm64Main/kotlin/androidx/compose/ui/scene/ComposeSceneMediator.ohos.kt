@@ -131,10 +131,19 @@ internal class ComposeSceneMediator(
     }
 
     fun onDraw(id: String, timestamp: Long, targetTimestamp: Long) {
-        notifySizeChange(id)
-        render.draw(targetTimestamp)
+        OhosTrace.traceSync("===ComposeSceneMediator.ohos notifySizeChange") {
+            notifySizeChange(id)
+        }
+
+        OhosTrace.traceSync("===ComposeSceneMediator.ohos render.draw") {
+            render.draw(targetTimestamp)
+        }
+
         // processInteropActions needs to be placed behind render.draw() to avoid drawing out of sync problems
-        processInteropActions()
+
+        OhosTrace.traceSync("===ComposeSceneMediator.ohos processInteropActions") {
+            processInteropActions()
+        }
     }
 
     fun keyboardWillShow(keyboardHeight: Float) {
@@ -184,7 +193,7 @@ internal class ComposeSceneMediator(
         activeChangedPointers.putAll(changedPointers.associateBy { it.id })
         val pointers = activeChangedPointers.values.toList()
 
-        OhosTrace.traceSync("sendPointerEvent") {
+        OhosTrace.traceSync("===ComposeSceneMediator.ohos sendPointerEvent") {
             scene.sendPointerEvent(
                 eventType = eventType,
                 pointers = pointers,

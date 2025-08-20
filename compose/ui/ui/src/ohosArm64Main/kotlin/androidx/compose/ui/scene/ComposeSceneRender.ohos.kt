@@ -19,6 +19,7 @@ package androidx.compose.ui.scene
 
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.interop.OhosTrace
 import org.jetbrains.skia.BackendRenderTarget
 import org.jetbrains.skia.Color
 import org.jetbrains.skia.ColorSpace
@@ -54,9 +55,17 @@ class ComposeSceneRender(
     }
 
     fun draw(timestamp: Long) {
-        ensureSurface()
-        onDraw(surfaceCanvas!!, timestamp)
-        flush()
+        OhosTrace.traceSync("===ComposeSceneRender.ohos ensureSurface") {
+            ensureSurface()
+        }
+
+        OhosTrace.traceSync("===ComposeSceneRender.ohos onDraw") {
+            onDraw(surfaceCanvas!!, timestamp)
+        }
+
+        OhosTrace.traceSync("===ComposeSceneRender.ohos flush") {
+            flush()
+        }
     }
 
     fun drawByPictureRecorder(timestamp: Long) {

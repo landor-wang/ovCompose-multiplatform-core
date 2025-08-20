@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -43,37 +44,45 @@ internal class LayoutNodeDrawScope(
     private var drawNode: DrawModifierNode? = null
 
     override fun drawContent() {
-        drawIntoCanvas { canvas ->
-            val drawNode = drawNode!!
-            val nextDrawNode = drawNode.nextDrawNode()
-            // NOTE(lmr): we only run performDraw directly on the node if the node's coordinator
-            // is our own. This seems to work, but we should think about a cleaner way to dispatch
-            // the draw pass as with the new modifier.node / coordinator structure this feels
-            // somewhat error prone.
-            if (nextDrawNode != null) {
-                nextDrawNode.dispatchForKind(Nodes.Draw) {
-                    it.performDraw(canvas)
+        OhosTrace.traceSync("===LayoutNodeDrawScope drawContent") {
+            drawIntoCanvas { canvas ->
+                val drawNode = drawNode!!
+                val nextDrawNode = drawNode.nextDrawNode()
+                // NOTE(lmr): we only run performDraw directly on the node if the node's coordinator
+                // is our own. This seems to work, but we should think about a cleaner way to dispatch
+                // the draw pass as with the new modifier.node / coordinator structure this feels
+                // somewhat error prone.
+                if (nextDrawNode != null) {
+                    OhosTrace.traceSync("===LayoutNodeDrawScope dispatchForKind") {
+                        nextDrawNode.dispatchForKind(Nodes.Draw) {
+                            it.performDraw(canvas)
+                        }
+                    }
+                } else {
+                    // TODO(lmr): this is needed in the case that the drawnode is also a measure node,
+                    //  but we should think about the right ways to handle this as this is very error
+                    //  prone i think
+                    val coordinator = drawNode.requireCoordinator(Nodes.Draw)
+                    val nextCoordinator = if (coordinator.tail === drawNode.node)
+                        coordinator.wrapped!!
+                    else
+                        coordinator
+                    nextCoordinator.performDraw(canvas)
                 }
-            } else {
-                // TODO(lmr): this is needed in the case that the drawnode is also a measure node,
-                //  but we should think about the right ways to handle this as this is very error
-                //  prone i think
-                val coordinator = drawNode.requireCoordinator(Nodes.Draw)
-                val nextCoordinator = if (coordinator.tail === drawNode.node)
-                    coordinator.wrapped!!
-                else
-                    coordinator
-                nextCoordinator.performDraw(canvas)
             }
         }
+
     }
 
     // This is not thread safe
     fun DrawModifierNode.performDraw(canvas: Canvas) {
-        val coordinator = requireCoordinator(Nodes.Draw)
-        val size = coordinator.size.toSize()
-        val drawScope = coordinator.layoutNode.mDrawScope
-        drawScope.drawDirect(canvas, size, coordinator, this)
+        OhosTrace.traceSync("===LayoutNodeDrawScope performDraw") {
+            val coordinator = requireCoordinator(Nodes.Draw)
+            val size = coordinator.size.toSize()
+            val drawScope = coordinator.layoutNode.mDrawScope
+            drawScope.drawDirect(canvas, size, coordinator, this)
+        }
+
     }
 
     internal fun draw(
@@ -82,9 +91,12 @@ internal class LayoutNodeDrawScope(
         coordinator: NodeCoordinator,
         drawNode: Modifier.Node,
     ) {
-        drawNode.dispatchForKind(Nodes.Draw) {
-            drawDirect(canvas, size, coordinator, it)
+        OhosTrace.traceSync("===LayoutNodeDrawScope draw") {
+            drawNode.dispatchForKind(Nodes.Draw) {
+                drawDirect(canvas, size, coordinator, it)
+            }
         }
+
     }
 
     internal fun drawDirect(
@@ -93,19 +105,22 @@ internal class LayoutNodeDrawScope(
         coordinator: NodeCoordinator,
         drawNode: DrawModifierNode,
     ) {
-        val previousDrawNode = this.drawNode
-        this.drawNode = drawNode
-        canvasDrawScope.draw(
-            coordinator,
-            coordinator.layoutDirection,
-            canvas,
-            size
-        ) {
-            with(drawNode) {
-                this@LayoutNodeDrawScope.draw()
+        OhosTrace.traceSync("===LayoutNodeDrawScope drawDirect") {
+            val previousDrawNode = this.drawNode
+            this.drawNode = drawNode
+            canvasDrawScope.draw(
+                coordinator,
+                coordinator.layoutDirection,
+                canvas,
+                size
+            ) {
+                with(drawNode) {
+                    this@LayoutNodeDrawScope.draw()
+                }
             }
+            this.drawNode = previousDrawNode
         }
-        this.drawNode = previousDrawNode
+
     }
 }
 

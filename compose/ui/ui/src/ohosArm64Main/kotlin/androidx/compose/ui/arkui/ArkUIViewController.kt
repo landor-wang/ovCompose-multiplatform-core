@@ -268,7 +268,7 @@ internal abstract class BasicArkUIViewController(
     }
 
     private fun onComposeVsync(timestamp: Long) {
-        OhosTrace.traceSync("ComposeVsync") {
+        OhosTrace.traceSync("===ArkUIViewController ComposeVsync") {
             ChoreographerManager.onVsync(timestamp)
         }
     }
@@ -278,13 +278,19 @@ internal abstract class BasicArkUIViewController(
             return
         }
         invalid = false
-        OhosTrace.traceSync("onDraw") {
-            prepareDraw()
+        OhosTrace.traceSync("===ArkUIViewController onDraw") {
+            OhosTrace.traceSync("===ArkUIViewController prepareDraw") {
+                prepareDraw()
+            }
+
             drawingTime = timestamp
-            onDraw(timestamp, targetTimestamp)
+            OhosTrace.traceSync("===ArkUIViewController realOnDraw") {
+                onDraw(timestamp, targetTimestamp)
+            }
+
         }
 
-        OhosTrace.traceSync("finishDraw") {
+        OhosTrace.traceSync("===ArkUIViewController finishDraw") {
             finishDraw()
         }
     }
@@ -460,7 +466,7 @@ fun _ArkUIViewController_onSurfaceDestroyed(controllerRef: COpaquePointer) {
 @InternalComposeApi
 fun _ArkUIViewController_onFrame(controllerRef: COpaquePointer, timestamp: Long, targetTimestamp: Long) {
     OhosTrace.increaseVsyncId()
-    OhosTrace.traceSync("VsyncFrame") {
+    OhosTrace.traceSync("===ArkUIViewController VsyncFrame") {
         controllerRef.getController()?.onFrame(timestamp, targetTimestamp)
     }
 }
@@ -506,7 +512,7 @@ fun _ArkUIViewController_keyboardWillHide(controllerRef: COpaquePointer) {
 @InternalComposeApi
 fun _ArkUIViewController_requestSyncRefresh(controllerRef: COpaquePointer): Int {
     var refreshId = -1
-    OhosTrace.traceSync("requestSyncRefresh") {
+    OhosTrace.traceSync("===ArkUIViewController requestSyncRefresh") {
         refreshId = controllerRef.getController()?.requestSyncRefresh() ?: -1
     }
     return refreshId
@@ -514,7 +520,7 @@ fun _ArkUIViewController_requestSyncRefresh(controllerRef: COpaquePointer): Int 
 
 @InternalComposeApi
 fun _ArkUIViewController_cancelSyncRefresh(controllerRef: COpaquePointer, refreshId: Int) {
-    OhosTrace.traceSync("cancelSyncRefresh") {
+    OhosTrace.traceSync("===ArkUIViewController cancelSyncRefresh") {
         controllerRef.getController()?.cancelSyncRefresh(refreshId)
     }
 }

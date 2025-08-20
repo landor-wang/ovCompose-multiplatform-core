@@ -148,7 +148,7 @@ internal fun InternalArkUIView(
                 // TODO: Gavin Temporarily fix setPosition not taking effect for the emulator
                 // It's possible that setTranslation is a better choice.
                 // In the current version of Harmony OS, setPosition causes a redraw, and it does not take effect on the emulator.
-                OhosTrace.traceSync("ArkUIView[${newOffset.y}]") {
+                OhosTrace.traceSync("===ArkUIView [${newOffset.y}]") {
                     embeddedInteropComponent.component.setTranslation(
                         newOffset.x / density,
                         newOffset.y / density
@@ -230,7 +230,7 @@ internal fun InternalArkUIView(
                         ", constraints=$constraints, localConstraints=$localConstraints"
                 )
             }
-            OhosTrace.traceSync("ArkUIViewMeasure") {
+            OhosTrace.traceSync("===ArkUIView Measure") {
                 embeddedInteropComponent.component.measure(localConstraints, density)
             }
 

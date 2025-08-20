@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.runtime.ComposeTabService
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
@@ -369,12 +370,18 @@ internal abstract class NodeCoordinator(
                     updateLayerPosition(layer)
                 }
             }
-            layer.drawLayer(canvas)
+            OhosTrace.traceSync("===NodeCoordinator layer.drawLayer") {
+                layer.drawLayer(canvas)
+            }
+
         } else {
             val x = position.x.toFloat()
             val y = position.y.toFloat()
             canvas.translate(x, y)
-            drawContainedDrawModifiers(canvas)
+            OhosTrace.traceSync("===NodeCoordinator drawContainedDrawModifiers") {
+                drawContainedDrawModifiers(canvas)
+            }
+
             canvas.translate(-x, -y)
         }
     }
@@ -383,10 +390,16 @@ internal abstract class NodeCoordinator(
     private fun drawContainedDrawModifiers(canvas: Canvas) {
         val head = head(Nodes.Draw)
         if (head == null) {
-            performDraw(canvas)
+            OhosTrace.traceSync("===NodeCoordinator performDraw") {
+                performDraw(canvas)
+            }
+
         } else {
             val drawScope = layoutNode.mDrawScope
-            drawScope.draw(canvas, size.toSize(), this, head)
+            OhosTrace.traceSync("===NodeCoordinator drawScope.draw") {
+                drawScope.draw(canvas, size.toSize(), this, head)
+            }
+
         }
     }
 

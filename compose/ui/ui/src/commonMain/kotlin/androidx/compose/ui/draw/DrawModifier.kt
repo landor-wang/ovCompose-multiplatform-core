@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.draw
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
@@ -113,8 +114,14 @@ internal class DrawBackgroundModifier(
 ) : Modifier.Node(), DrawModifierNode {
 
     override fun ContentDrawScope.draw() {
-        onDraw()
-        drawContent()
+        OhosTrace.traceSync("===DrawModifier: onDraw") {
+            onDraw()
+        }
+
+        OhosTrace.traceSync("===DrawModifier: drawContent") {
+            drawContent()
+        }
+
     }
 }
 
@@ -190,11 +197,17 @@ private class CacheDrawModifierNodeImpl(
     override val size: Size get() = requireCoordinator(Nodes.LayoutAware).size.toSize()
 
     override fun onMeasureResultChanged() {
-        invalidateDrawCache()
+        OhosTrace.traceSync("===DrawModifier: onMeasureResultChanged") {
+            invalidateDrawCache()
+        }
+
     }
 
     override fun onObservedReadsChanged() {
-        invalidateDrawCache()
+        OhosTrace.traceSync("===DrawModifier: onObservedReadsChanged") {
+            invalidateDrawCache()
+        }
+
     }
 
     override fun invalidateDrawCache() {
@@ -306,6 +319,9 @@ private class DrawWithContentModifier(
 ) : Modifier.Node(), DrawModifierNode {
 
     override fun ContentDrawScope.draw() {
-        onDraw()
+        OhosTrace.traceSync("===DrawWithContentModifier: onDraw") {
+            onDraw()
+        }
+
     }
 }

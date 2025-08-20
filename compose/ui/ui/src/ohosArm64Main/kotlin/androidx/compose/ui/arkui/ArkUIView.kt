@@ -275,7 +275,7 @@ class ArkUIRootView(jsArkUIRootView: napi_value) : InteropContainer<ArkUIViewCon
             view.name.nApiValue(),
             view.parameter.jsValue,
         )
-        OhosTrace.traceSync("bindJs") {
+        OhosTrace.traceSync("===ArkUIView bindJs") {
             view.bindJs(jsArkUIView)
         }
     }
