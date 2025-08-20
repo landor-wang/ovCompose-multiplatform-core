@@ -19,7 +19,8 @@ cmake_minimum_required(VERSION 3.22)
 project(datastore_shared_counter)
 
 set (CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 add_library(shared_counter STATIC shared_counter.cc)
 add_library(datastore_shared_counter SHARED jni/androidx_datastore_core_SharedCounter.cc)

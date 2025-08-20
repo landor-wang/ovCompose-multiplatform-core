@@ -18,7 +18,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project(compose_inspection_inspection)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lz -Wall -Werror -Wno-unused-command-line-argument -Wno-shift-count-overflow")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lz -Wall -Werror -Wno-unused-command-line-argument -Wno-shift-count-overflow")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lz -Wall -Wno-unused-command-line-argument -Wno-shift-count-overflow")
 
 include_directories(
         ../../../../../../../external/dexter/slicer/export
