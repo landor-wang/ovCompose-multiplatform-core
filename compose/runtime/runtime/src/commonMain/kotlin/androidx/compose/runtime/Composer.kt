@@ -20,6 +20,7 @@
 package androidx.compose.runtime
 
 import androidx.collection.MutableIntIntMap
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.runtime.Composer.Companion.equals
 import androidx.compose.runtime.changelist.ChangeList
 import androidx.compose.runtime.changelist.ComposerChangeListWriter
@@ -3353,14 +3354,17 @@ internal class ComposerImpl(
         // some invalidations scheduled already. it can happen when during some parent composition
         // there were a change for a state which was used by the child composition. such changes
         // will be tracked and added into `invalidations` list.
-        if (
-            invalidationsRequested.isNotEmpty() ||
-            invalidations.isNotEmpty() ||
-            forciblyRecompose
-        ) {
-            doCompose(invalidationsRequested, null)
-            return changes.isNotEmpty()
+        OhosTrace.traceSync("===Composer recompose") {
+            if (
+                invalidationsRequested.isNotEmpty() ||
+                invalidations.isNotEmpty() ||
+                forciblyRecompose
+            ) {
+                doCompose(invalidationsRequested, null)
+                return changes.isNotEmpty()
+            }
         }
+
         return false
     }
 
@@ -3369,56 +3373,59 @@ internal class ComposerImpl(
         content: (@Composable () -> Unit)?
     ) {
         runtimeCheck(!isComposing) { "Reentrant composition is not supported" }
-        trace("Compose:recompose") {
-            compositionToken = currentSnapshot().id
-            providerUpdates = null
-            invalidationsRequested.forEach { scope, set ->
-                val location = scope.anchor?.location ?: return
-                invalidations.add(Invalidation(scope, location, set))
-            }
-            invalidations.sortWith(InvalidationLocationAscending)
-            nodeIndex = 0
-            var complete = false
-            isComposing = true
-            try {
-                startRoot()
-
-                // vv Experimental for forced
-                @Suppress("UNCHECKED_CAST")
-                val savedContent = nextSlot()
-                if (savedContent !== content && content != null) {
-                    updateValue(content as Any?)
+        OhosTrace.traceSync("===Composer doCompose") {
+            trace("Compose:recompose") {
+                compositionToken = currentSnapshot().id
+                providerUpdates = null
+                invalidationsRequested.forEach { scope, set ->
+                    val location = scope.anchor?.location ?: return
+                    invalidations.add(Invalidation(scope, location, set))
                 }
-                // ^^ Experimental for forced
+                invalidations.sortWith(InvalidationLocationAscending)
+                nodeIndex = 0
+                var complete = false
+                isComposing = true
+                try {
+                    startRoot()
 
-                // Ignore reads of derivedStateOf recalculations
-                observeDerivedStateRecalculations(derivedStateObserver) {
-                    if (content != null) {
-                        startGroup(invocationKey, invocation)
-                        invokeComposable(this, content)
-                        endGroup()
-                    } else if (
-                        (forciblyRecompose || providersInvalid) &&
-                        savedContent != null &&
-                        savedContent != Composer.Empty
-                    ) {
-                        startGroup(invocationKey, invocation)
-                        @Suppress("UNCHECKED_CAST")
-                        invokeComposable(this, savedContent as @Composable () -> Unit)
-                        endGroup()
-                    } else {
-                        skipCurrentGroup()
+                    // vv Experimental for forced
+                    @Suppress("UNCHECKED_CAST")
+                    val savedContent = nextSlot()
+                    if (savedContent !== content && content != null) {
+                        updateValue(content as Any?)
                     }
+                    // ^^ Experimental for forced
+
+                    // Ignore reads of derivedStateOf recalculations
+                    observeDerivedStateRecalculations(derivedStateObserver) {
+                        if (content != null) {
+                            startGroup(invocationKey, invocation)
+                            invokeComposable(this, content)
+                            endGroup()
+                        } else if (
+                            (forciblyRecompose || providersInvalid) &&
+                            savedContent != null &&
+                            savedContent != Composer.Empty
+                        ) {
+                            startGroup(invocationKey, invocation)
+                            @Suppress("UNCHECKED_CAST")
+                            invokeComposable(this, savedContent as @Composable () -> Unit)
+                            endGroup()
+                        } else {
+                            skipCurrentGroup()
+                        }
+                    }
+                    endRoot()
+                    complete = true
+                } finally {
+                    isComposing = false
+                    invalidations.clear()
+                    if (!complete) abortRoot()
+                    createFreshInsertTable()
                 }
-                endRoot()
-                complete = true
-            } finally {
-                isComposing = false
-                invalidations.clear()
-                if (!complete) abortRoot()
-                createFreshInsertTable()
             }
         }
+
     }
 
     val hasInvalidations get() = invalidations.isNotEmpty()
