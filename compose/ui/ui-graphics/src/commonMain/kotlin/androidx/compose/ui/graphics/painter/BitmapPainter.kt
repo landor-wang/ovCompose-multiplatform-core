@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics.painter
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
@@ -90,18 +91,21 @@ class BitmapPainter(
     private var colorFilter: ColorFilter? = null
 
     override fun DrawScope.onDraw() {
-        drawImage(
-            image,
-            srcOffset,
-            srcSize,
-            dstSize = IntSize(
-                this@onDraw.size.width.roundToInt(),
-                this@onDraw.size.height.roundToInt()
-            ),
-            alpha = alpha,
-            colorFilter = colorFilter,
-            filterQuality = filterQuality
-        )
+        OhosTrace.traceSync("===BitmapPainter DrawScope.onDraw") {
+            drawImage(
+                image,
+                srcOffset,
+                srcSize,
+                dstSize = IntSize(
+                    this@onDraw.size.width.roundToInt(),
+                    this@onDraw.size.height.roundToInt()
+                ),
+                alpha = alpha,
+                colorFilter = colorFilter,
+                filterQuality = filterQuality
+            )
+        }
+
     }
 
     /**

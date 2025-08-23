@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.draw
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -342,7 +343,10 @@ private class PainterNode(
         // content accordingly to fit within the drawing area.
         translate(dx, dy) {
             with(painter) {
-                draw(size = scaledSize, alpha = alpha, colorFilter = colorFilter)
+                OhosTrace.traceSync("===PainterModifier ContentDrawScope.draw") {
+                    draw(size = scaledSize, alpha = alpha, colorFilter = colorFilter)
+                }
+
             }
         }
 

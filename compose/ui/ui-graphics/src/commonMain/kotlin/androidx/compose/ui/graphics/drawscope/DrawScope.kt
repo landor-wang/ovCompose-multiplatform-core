@@ -17,6 +17,7 @@
 package androidx.compose.ui.graphics.drawscope
 
 import androidx.annotation.FloatRange
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -562,17 +563,20 @@ interface DrawScope : Density {
         blendMode: BlendMode = DefaultBlendMode,
         filterQuality: FilterQuality = DefaultFilterQuality
     ) {
-        drawImage(
-            image = image,
-            srcOffset = srcOffset,
-            srcSize = srcSize,
-            dstOffset = dstOffset,
-            dstSize = dstSize,
-            alpha = alpha,
-            style = style,
-            colorFilter = colorFilter,
-            blendMode = blendMode
-        )
+        OhosTrace.traceSync("===DrawScope drawImage") {
+            drawImage(
+                image = image,
+                srcOffset = srcOffset,
+                srcSize = srcSize,
+                dstOffset = dstOffset,
+                dstSize = dstSize,
+                alpha = alpha,
+                style = style,
+                colorFilter = colorFilter,
+                blendMode = blendMode
+            )
+        }
+
     }
 
     /**

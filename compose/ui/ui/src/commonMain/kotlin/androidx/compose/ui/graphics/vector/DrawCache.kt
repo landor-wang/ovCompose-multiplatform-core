@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics.vector
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasType
@@ -100,7 +101,10 @@ internal class DrawCache {
             "drawCachedImage must be invoked first before attempting to draw the result " +
                 "into another destination"
         }
-        target.drawImage(targetImage, srcSize = size, alpha = alpha, colorFilter = colorFilter)
+        OhosTrace.traceSync("===DrawCache drawInto") {
+            target.drawImage(targetImage, srcSize = size, alpha = alpha, colorFilter = colorFilter)
+        }
+
     }
 
     /**

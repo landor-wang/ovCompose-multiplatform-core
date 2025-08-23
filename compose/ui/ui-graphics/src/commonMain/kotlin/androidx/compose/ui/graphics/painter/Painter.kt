@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.graphics.painter
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -205,11 +206,17 @@ abstract class Painter {
                     // TODO (b/154550724) njawad replace with RenderNode/Layer API usage
                     drawIntoCanvas { canvas ->
                         canvas.withSaveLayer(layerRect, obtainPaint()) {
-                            onDraw()
+                            OhosTrace.traceSync("===Painter DrawScope.draw with useLayer") {
+                                onDraw()
+                            }
+
                         }
                     }
                 } else {
-                    onDraw()
+                    OhosTrace.traceSync("===Painter DrawScope.draw no useLayer") {
+                        onDraw()
+                    }
+
                 }
             }
         }

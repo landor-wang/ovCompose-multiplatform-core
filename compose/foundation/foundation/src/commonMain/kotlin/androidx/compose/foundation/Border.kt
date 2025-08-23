@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.common.interop.OhosTrace
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.CacheDrawModifierNode
@@ -293,7 +294,10 @@ internal class BorderModifierNode(
             onDrawWithContent {
                 drawContent()
                 translate(pathBounds.left, pathBounds.top) {
-                    drawImage(cacheImageBitmap, srcSize = pathBoundsSize, colorFilter = colorFilter)
+                    OhosTrace.traceSync("===Border drawGenericBorder") {
+                        drawImage(cacheImageBitmap, srcSize = pathBoundsSize, colorFilter = colorFilter)
+                    }
+
                 }
             }
         }
